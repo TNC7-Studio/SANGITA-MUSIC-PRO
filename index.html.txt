@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#facc15">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SANGITA MUSIC PRO</title>
+    
+    <!-- App Icon / Favicon Kustom -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231a1f2c'/%3E%3Cpath d='M190 160 L370 256 L190 352 Z' fill='%23facc15'/%3E%3Ctext x='256' y='440' font-family='sans-serif' font-size='65' font-weight='900' letter-spacing='0' fill='%23ffffff' text-anchor='middle'%3ESANGITA%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231a1f2c'/%3E%3Cpath d='M190 160 L370 256 L190 352 Z' fill='%23facc15'/%3E%3Ctext x='256' y='440' font-family='sans-serif' font-size='65' font-weight='900' letter-spacing='0' fill='%23ffffff' text-anchor='middle'%3ESANGITA%3C/text%3E%3C/svg%3E">
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #09090b;
+            --panel-bg: rgba(24, 24, 27, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --input-bg: rgba(0, 0, 0, 0.5);
+            --primary-accent: #facc15;
+            --primary-hover: #eab308;
+            --table-hover: rgba(255, 255, 255, 0.04);
+            --header-bg: rgba(9, 9, 11, 0.9);
+            --panel-glow: rgba(250, 204, 21, 0.15);
+        }
+
+        [data-theme="terang"] {
+            --bg-color: #fafafa;
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --panel-border: rgba(0, 0, 0, 0.08);
+            --text-main: #09090b;
+            --text-muted: #52525b;
+            --input-bg: rgba(244, 244, 245, 0.8);
+            --table-hover: rgba(0, 0, 0, 0.03);
+            --primary-accent: #2563eb;
+            --primary-hover: #1d4ed8;
+            --panel-glow: rgba(37, 99, 235, 0.15);
+        }
+
+        [data-theme="kuning"] {
+            --bg-color: #14100c;
+            --panel-bg: rgba(36, 28, 20, 0.7);
+            --panel-border: rgba(245, 158, 11, 0.2);
+            --text-main: #fef3c7;
+            --text-muted: #d6d3d1;
+            --input-bg: rgba(20, 16, 12, 0.8);
+            --table-hover: rgba(245, 158, 11, 0.08);
+            --primary-accent: #f59e0b;
+            --primary-hover: #d97706;
+            --panel-glow: rgba(245, 158, 11, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            user-select: none; 
+            -webkit-user-select: none;
+            text-transform: uppercase;
+        }
+
+        .case-sensitive {
+            text-transform: none !important;
+        }
+
+        input, textarea, table, .allow-select { user-select: text; -webkit-user-select: text; }
+
+        .container {
+            width: 100%; max-width: 1200px; margin: 0 auto; padding: 0.5rem 1rem;
+            flex-grow: 1; display: flex; flex-direction: column; gap: 0.5rem; z-index: 1;
+        }
+
+        .hidden { display: none !important; }
+
+        .panel-glass {
+            background: var(--panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--panel-border); border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px var(--panel-glow);
+        }
+
+        header.panel-glass { position: relative; z-index: 50; }
+
+        .btn {
+            cursor: pointer; border: none; outline: none; font-family: inherit;
+            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+
+        .btn-pill {
+            padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.75rem;
+            font-weight: 600; background: transparent; border: 1px solid var(--panel-border); color: var(--text-main);
+        }
+
+        .btn-pill:hover {
+            color: var(--primary-accent); border-color: var(--primary-accent); background: rgba(250, 204, 21, 0.05);
+        }
+
+        .btn-pill.active {
+            background-color: var(--primary-accent); color: #000 !important;
+            border-color: var(--primary-accent); box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);
+        }
+
+        .form-input, .form-select {
+            width: 100%; background-color: var(--input-bg); border: 1px solid var(--panel-border);
+            color: var(--text-main); border-radius: 0.5rem; padding: 0.35rem 0.75rem;
+            font-size: 0.75rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-select { cursor: pointer; appearance: none; font-weight: 600; }
+        .form-input:focus, .form-select:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2); }
+
+        .table-container { overflow-x: auto; }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        
+        th {
+            position: sticky;
+            top: 0;
+            background-color: var(--panel-bg);
+            z-index: 10;
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted); font-weight: 800; padding: 0.35rem 0.5rem;
+            border-bottom: 2px solid var(--panel-border); text-align: left; white-space: nowrap;
+        }
+        td {
+            padding: 0.2rem 0.5rem; font-size: 0.75rem; border-bottom: 1px solid var(--panel-border);
+            vertical-align: middle; font-weight: 500; line-height: 1.1;
+        }
+        tr:hover td { background-color: var(--table-hover); cursor: default; }
+
+        .num-warning { background-color: rgba(250, 204, 21, 0.2); color: #facc15 !important; font-weight: 900; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(250, 204, 21, 0.5); display: inline-block;}
+        .num-danger { background-color: rgba(239, 68, 68, 0.2); color: #ef4444 !important; font-weight: 900; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.5); display: inline-block;}
+        
+        [data-theme="terang"] .num-warning { background-color: rgba(250, 204, 21, 0.3); color: #b45309 !important; border-color: #f59e0b; }
+        [data-theme="terang"] .num-danger { background-color: rgba(239, 68, 68, 0.2); color: #b91c1c !important; border-color: #ef4444; }
+
+        .text-xs { font-size: 0.7rem; } .text-sm { font-size: 0.8rem; }
+        .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; }
+        .font-bold { font-weight: 700; } .font-semibold { font-weight: 600; }
+        .text-muted { color: var(--text-muted); } .text-accent { color: var(--primary-accent); }
+        .text-emerald { color: #10b981; } .text-red { color: #ef4444; }
+        
+        .flex { display: flex; } .flex-col { display: flex; flex-direction: column; }
+        .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; } .gap-2 { gap: 0.5rem; } .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; } .text-center { text-align: center; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 1rem;
+        }
+
+        .modal-content {
+            background: var(--bg-color); border: 1px solid var(--panel-border);
+            border-radius: 1rem; width: 100%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--panel-glow);
+        }
+
+        .modal-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--panel-border); display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+        .badge-views {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.65rem; padding: 4px 8px; border-radius: 9999px;
+            border: 1px solid rgba(249, 115, 22, 0.4); color: #fca5a5; background: rgba(30, 20, 20, 0.8);
+            font-weight: 700; text-transform: capitalize;
+        }
+        .badge-views i { color: #fb923c; }
+        .badge-subs {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;
+            border: 1px solid rgba(59, 130, 246, 0.5); color: #60a5fa; background: rgba(59, 130, 246, 0.1);
+        }
+        .icon-box {
+            width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+
+        #toast {
+            display: none; align-items: center; gap: 0.5rem; font-size: 0.75rem;
+            background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 0.25rem 0.75rem;
+            border-radius: 999px; border: 1px solid rgba(16, 185, 129, 0.3);
+            font-weight: bold; white-space: nowrap;
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 100000;
+        }
+        #toast.show { display: flex; animation: fadeInToast 0.2s ease-out forwards; }
+        #toast.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background-color: rgba(26, 31, 41, 0.95); }
+        @keyframes fadeInToast { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 4px; }
+
+        .settings-card { background: rgba(0, 0, 0, 0.2); border: 1px solid var(--panel-border); border-radius: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+        .form-grid { display: flex; flex-direction: column; gap: 1.25rem; width: 100%; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.02em; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; box-sizing: border-box; background-color: rgba(0, 0, 0, 0.5); border: 1px solid var(--panel-border); color: var(--text-main); 
+            border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.2); }
+        
+        .cloud-status {
+            display: flex; align-items: center; justify-content: center; gap: 0; font-size: 0.75rem;
+            background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);
+            white-space: nowrap; 
+            font-weight: 800; 
+            letter-spacing: 0.05em; 
+            width: 28px; 
+            height: 28px; 
+            padding: 0;
+            cursor: help;
+        }
+        .cloud-status span.status-text {
+            display: none !important;
+        }
+        .cloud-status.offline { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; padding-bottom: 1rem; }
+        .card-item { background: rgba(0,0,0,0.2); border: 1px solid var(--panel-border); border-radius: 1rem; padding: 1.25rem; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1), 0 0 10px var(--panel-glow); }
+        .card-item:hover { border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 20px var(--panel-glow); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .card-stat { background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.05); }
+        .chart-container { width: 100%; height: 300px; background: rgba(0,0,0,0.2); border-radius: 1rem; border: 1px solid var(--panel-border); padding: 1rem; margin-bottom: 1rem; display: none; position: relative; }
+        .chart-container.show { display: block; }
+
+        #dashboard-view {
+            height: 100vh;
+            max-height: 100vh;
+            padding: 1rem;
+            gap: 1rem;
+        }
+        
+        .panel-glass.flex-col {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .table-container { 
+            overflow-y: auto;
+            flex-grow: 1;
+            height: 0;
+        }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        
+        th {
+            position: sticky;
+            top: 0;
+            background-color: var(--panel-bg);
+            z-index: 10;
+            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted); font-weight: 800; padding: 0.75rem 0.5rem;
+            border-bottom: 2px solid var(--panel-border); text-align: left; white-space: nowrap;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(250, 204, 21, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .badge-live {
+            display: flex; align-items: center; justify-content: center; gap: 0; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em;
+            background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);
+            white-space: nowrap; 
+            width: 28px;
+            height: 28px; 
+            padding: 0;
+            cursor: help;
+        }
+        .badge-live span.status-text {
+            display: none !important;
+        }
+        .badge-live i { animation: blink 1.5s infinite; font-size: 0.5rem; }
+
+        @media screen and (min-width: 769px) {
+            .hide-on-desktop { display: none !important; }
+            body {
+                overflow-x: auto !important;
+                min-width: 920px;
+            }
+            .container {
+                width: 900px !important;
+                min-width: 900px !important;
+                max-width: 900px !important;
+                margin: 0 auto !important;
+                padding: 0.5rem 0 !important;
+            }
+            header.panel-glass {
+                flex-wrap: nowrap !important;
+                justify-content: flex-start !important;
+            }
+            header.panel-glass h2 {
+                font-size: 1.8rem !important; 
+                white-space: nowrap; 
+                letter-spacing: 0.5px;
+                font-weight: 900;
+            }
+            header .justify-end {
+                margin-left: auto !important;
+                flex-wrap: nowrap !important;
+            }
+            #btn-tambah-channel-mobile {
+                max-width: 350px !important;
+            }
+            th, td {
+                padding: 0.25rem 0.4rem !important;
+                font-size: 0.7rem !important;
+            }
+            th {
+                font-size: 0.6rem !important;
+            }
+            #dashboard-view > div[style*="display: grid"] {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 0.4rem !important;
+            }
+            .flex.items-center.gap-2.flex-wrap {
+                flex-wrap: nowrap !important;
+                gap: 0.25rem !important;
+            }
+            #search-input {
+                font-size: 0.65rem !important;
+            }
+            #filter-monet, #filter-pengelola, #sort-data {
+                font-size: 0.65rem !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+            #btn-reset {
+                font-size: 0.65rem !important;
+                padding: 0.25rem 0.5rem !important;
+                white-space: nowrap;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .hide-on-mobile { display: none !important; }
+            body { 
+                overflow: hidden;
+            }
+            #dashboard-view {
+                padding: 0.25rem; 
+                gap: 0.25rem;
+                display: flex;
+                flex-direction: column;
+                height: 100dvh;
+            }
+            
+            /* MENGUBAH LAYOUT HEADER MOBILE AGAR SEJAJAR */
+            header.panel-glass { 
+                flex-direction: row !important; 
+                flex-wrap: nowrap !important; /* Jangan wrap ke baris baru */
+                justify-content: space-between !important;
+                align-items: center !important; 
+                padding: 0.4rem 0.5rem !important; 
+                gap: 0.25rem !important; 
+                border-radius: 0.75rem; 
+                flex-shrink: 0; 
+                overflow: hidden; /* Cegah meluber */
+            }
+            
+            header .flex.items-center.gap-3 { gap: 0.25rem !important; flex-shrink: 1; min-width: 0; }
+            header .icon-box { width: 22px !important; height: 22px !important; font-size: 0.7rem !important; border-radius: 6px; flex-shrink: 0; }
+            header .flex.items-center.gap-3 > div:nth-child(2) { overflow: hidden; }
+            header h2 { font-size: 0.85rem !important; line-height: 1; margin-bottom: 3px !important; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            header p#clock, header p.text-xs { font-size: 0.45rem !important; line-height: 1; margin-top: 2px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            #top-toggles { margin-left: 0.25rem !important; height: 22px !important; padding: 1px !important; flex-shrink: 0; }
+            #top-toggles .btn { width: 18px !important; height: 18px !important; font-size: 0.6rem !important; }
+
+            header .justify-end { 
+                width: auto !important; 
+                justify-content: flex-end !important; 
+                margin-top: 0 !important; 
+                gap: 0.2rem !important; 
+                flex-wrap: nowrap !important; /* Jangan wrap indikator ke baris bawah */
+                flex-shrink: 0; 
+            }
+
+            /* MENGUBAH INDIKATOR MENJADI HANYA IKON DI MOBILE */
+            .cloud-status {
+                width: 22px !important; 
+                height: 22px !important; 
+            }
+
+            .badge-live {
+                width: 22px !important; 
+                height: 22px !important; 
+            }
+            
+            #last-sync-time { 
+                padding: 0.15rem 0.25rem !important; 
+                font-size: 0.45rem !important; /* Sedikit perbesar agar terbaca */
+                margin-left: 0 !important; 
+                border-radius: 6px !important; 
+                height: 22px !important; 
+                display: flex; 
+                align-items: center; 
+                white-space: nowrap; 
+            }
+
+            #dashboard-view > div[style*="display: grid"] { 
+                grid-template-columns: 1fr 1fr !important; 
+                gap: 0.25rem !important; 
+                flex-shrink: 0; 
+            }
+            #dashboard-view > div[style*="display: grid"] .panel-glass { 
+                flex-direction: row; 
+                text-align: left; 
+                align-items: center;
+                justify-content: flex-start; 
+                gap: 0.3rem; 
+                padding: 0.25rem 0.4rem !important; 
+                border-radius: 0.75rem;
+            }
+            #dashboard-view > div[style*="display: grid"] .icon-box {
+                width: 18px !important; height: 18px !important; font-size: 0.55rem !important; margin: 0; border-radius: 6px;
+            }
+            #dashboard-view > div[style*="display: grid"] > div > div:last-child {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            #dashboard-view > div[style*="display: grid"] p { font-size: 0.4rem !important; line-height: 1; letter-spacing: 0; margin-bottom: 0px; }
+            #stat-total, #stat-monet, #stat-aktif, #stat-new { font-size: 0.75rem !important; line-height: 1; }
+
+            .panel-glass.flex-col {
+                border-radius: 0.75rem;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                flex-grow: 1;
+                height: 0;
+            }
+
+            #dashboard-view > .panel-glass.flex-col > div:first-child { 
+                padding: 0.4rem !important; 
+                flex-shrink: 0;
+            }
+            .flex.justify-between.items-center { flex-direction: row; align-items: center !important; gap: 0.25rem; margin-bottom: 0.25rem; }
+            .flex.justify-between.items-center h2 { font-size: 0.6rem !important; width: max-content; }
+            
+            #btn-tambah-channel-mobile { max-width: none !important; flex-grow: 1; }
+            #btn-tambah-channel-mobile button { padding: 0.3rem 0.5rem !important; font-size: 0.55rem !important; box-shadow: none !important;}
+
+            #dashboard-view > .panel-glass.flex-col > div:first-child .flex.items-center.gap-2.flex-wrap {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.25rem !important;
+            }
+            #dashboard-view > .panel-glass.flex-col > div:first-child .flex.items-center.gap-2.flex-wrap > div[style*="max-width: 300px"] { 
+                max-width: 100% !important; width: 100%; grid-column: span 2; 
+            }
+            #search-input { width: 100%; font-size: 0.55rem !important; padding: 0.25rem 0.5rem 0.25rem 1.5rem !important; }
+            #dashboard-view > .panel-glass.flex-col > div:first-child .flex.items-center.gap-2.flex-wrap > div > i { font-size: 0.55rem !important; }
+            #filter-monet, #filter-pengelola, #sort-data { width: 100% !important; flex: none; font-size: 0.45rem !important; padding: 0.25rem !important; border-radius: 0.4rem; }
+            #btn-reset { width: 100%; margin-top: 0; font-size: 0.45rem !important; padding: 0.25rem !important; border-radius: 0.4rem; grid-column: span 2; }
+            
+            .table-container { 
+                -webkit-overflow-scrolling: touch; 
+                padding-bottom: 0.5rem; 
+                overflow-y: auto;
+                flex-grow: 1;
+                height: 100%;
+            }
+            
+            th { padding: 0.4rem 0.25rem !important; font-size: 0.5rem !important; }
+            td { padding: 0.2rem 0.25rem !important; font-size: 0.55rem !important; }
+            .card-item { padding: 0.5rem !important; gap: 0.4rem !important; border-radius: 0.75rem; }
+            .card-stat { padding: 0.4rem !important; border-radius: 0.5rem; }
+            
+            .modal-content { max-height: 92vh; margin: 0.5rem; width: auto; border-radius: 1rem; }
+            .modal-header, .modal-footer { padding: 0.75rem 1rem !important; }
+            .modal-body { padding: 0.75rem 1rem !important; display: flex; flex-direction: column; }
+            .form-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+            .form-group.full-width { grid-column: auto; }
+            .form-group input, .form-group textarea, .form-group select { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dashboard-view" class="container">
+        <header class="panel-glass" style="padding: 0.5rem 1rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+            <div class="flex items-center gap-3" style="min-width: max-content;">
+                <div class="icon-box" style="width: 38px; height: 38px; font-size: 1.2rem; background: rgba(250, 204, 21, 0.1); color: var(--primary-accent); border: 1px solid rgba(255, 255, 255, 0.1); position: relative;">
+                    <i class="fab fa-youtube"></i>
+                    <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #10b981; border-radius: 50%; border: 2px solid var(--bg-color);"></div>
+                </div>
+                <div>
+                    <h2 class="font-bold text-xl" style="margin-bottom: -2px; white-space: nowrap;">SANGITA MUSIC PRO</h2>
+                    <p class="text-xs text-muted" style="font-size: 0.7rem; font-family: monospace; color: var(--primary-accent); font-weight: 700;"><span id="clock"></span></p>
+                </div>
+                <div id="top-toggles" class="flex items-center gap-1" style="background: var(--input-bg); padding: 2px; border-radius: 999px; border: 1px solid var(--panel-border); margin-left: 0.5rem; height: 28px;">
+                    <button class="btn" onclick="window.openModal('modal-settings')" style="width: 24px; height: 24px; font-size: 0.75rem; border-radius: 50%; background: transparent; color: var(--text-muted);" title="PENGATURAN"><i class="fas fa-cog"></i></button>
+                    <button class="btn theme-toggle-btn" onclick="window.cycleTheme()" style="width: 24px; height: 24px; font-size: 0.75rem; border-radius: 50%; background: transparent; color: var(--text-muted); transition: all 0.3s;" title="GANTI TEMA"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <button id="btn-install" class="btn btn-pill hidden" style="background: var(--primary-accent); color: #1a1814; border: none; font-weight: bold; height: 28px;"><i class="fas fa-download"></i> INSTALL APP</button>
+                <div id="cloud-status-indicator" class="cloud-status" title="Status Cloud">
+                    <i class="fas fa-spinner fa-spin"></i> <span class="status-text">MENGHUBUNGKAN...</span>
+                </div>
+
+                <div id="toast"><i class="fas fa-info-circle"></i> <span id="toast-msg">SUCCESS</span></div>
+
+                <div id="auto-sync-badge" class="badge-live hidden" title="Auto Sync Aktif"><i class="fas fa-circle"></i> <span class="status-text">AUTO-SYNC</span></div>
+                
+                <div id="last-sync-time" class="text-xs text-muted font-bold hidden" style="background: rgba(255,255,255,0.05); padding: 0 8px; border-radius: 6px; border: 1px solid var(--panel-border); height: 28px; display: flex; align-items: center; white-space: nowrap;"></div>
+            </div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+            <div class="panel-glass flex items-center gap-3" style="padding: 0.5rem 1rem;">
+                <div class="icon-box" style="width: 32px; height: 32px; font-size: 0.9rem; background: rgba(250,204,21,0.1); color: var(--primary-accent); border: 1px solid var(--panel-border);"><i class="fas fa-tv"></i></div>
+                <div><p class="text-[0.65rem] font-bold text-muted" style="text-transform: uppercase; font-size: 0.65rem;">TOTAL CHANNEL</p><h3 class="text-lg font-bold" id="stat-total">0</h3></div>
+            </div>
+            <div class="panel-glass flex items-center gap-3" style="padding: 0.5rem 1rem;">
+                <div class="icon-box" style="width: 32px; height: 32px; font-size: 0.9rem; background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.3);"><i class="fas fa-dollar-sign"></i></div>
+                <div><p class="text-[0.65rem] font-bold text-muted" style="text-transform: uppercase; font-size: 0.65rem;">SUDAH MONETISASI</p><h3 class="text-lg font-bold" id="stat-monet">0</h3></div>
+            </div>
+            <div class="panel-glass flex items-center gap-3" style="padding: 0.5rem 1rem;">
+                <div class="icon-box" style="width: 32px; height: 32px; font-size: 0.9rem; background: rgba(148,163,184,0.1); color: var(--text-muted); border: 1px solid rgba(148,163,184,0.3);"><i class="fas fa-dollar-sign"></i></div>
+                <div><p class="text-[0.65rem] font-bold text-muted" style="text-transform: uppercase; font-size: 0.65rem;">BELUM MONET</p><h3 class="text-lg font-bold" id="stat-aktif">0</h3></div>
+            </div>
+            <div class="panel-glass flex items-center gap-3" style="padding: 0.5rem 1rem;">
+                <div class="icon-box" style="width: 32px; height: 32px; font-size: 0.9rem; background: rgba(56,189,248,0.1); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3);"><i class="fas fa-plus-circle"></i></div>
+                <div><p class="text-[0.65rem] font-bold text-muted" style="text-transform: uppercase; font-size: 0.65rem;">BARU (24 JAM)</p><h3 class="text-lg font-bold" id="stat-new">0</h3></div>
+            </div>
+        </div>
+
+        <div class="panel-glass flex-col" style="flex-grow: 1; overflow: hidden; display: flex;">
+            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--panel-border);">
+                <div class="flex justify-between items-center" style="margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="text-sm font-bold">DAFTAR CHANNEL</h2>
+                        <div class="flex items-center gap-1" style="font-size: 0.5rem; font-weight: 800; margin-left: 0.25rem;">
+                            <span class="num-warning" style="padding: 2px 5px; border-radius: 4px;" title="Kuning: 1 Hari Belum Upload">UP 1</span>
+                            <span class="num-danger" style="padding: 2px 5px; border-radius: 4px;" title="Merah: 2 Hari atau lebih Belum Upload">UP 2</span>
+                        </div>
+                    </div>
+
+                    <div style="flex-grow: 1; max-width: 450px;" id="btn-tambah-channel-mobile">
+                        <button class="btn btn-pill w-full" onclick="window.openModal('modal-search-yt')" style="background-color: var(--primary-accent); color: #000; font-weight: 800; padding: 0.5rem 1rem; border: none; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.25); white-space: normal; line-height: 1.2;">
+                            <i class="fas fa-search"></i> PASTE LINK CHANNEL BARU DI SINI
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <div style="position: relative; flex-grow: 1; max-width: 300px;">
+                        <i class="fas fa-search text-muted" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem;"></i>
+                        <input type="text" id="search-input" class="form-input text-xs" style="padding-left: 1.75rem;" autocomplete="new-password" name="search_channel_input_x99" placeholder="CARI NAMA ATAU ID CHANNEL..." oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <select id="filter-monet" class="form-select text-xs" style="width: auto;">
+                        <option value="all">SEMUA MONETISASI</option>
+                        <option value="yes">MONETISASI: YES</option>
+                        <option value="no">MONETISASI: NO</option>
+                    </select>
+                    <select id="filter-pengelola" class="form-select text-xs" style="width: auto; text-transform: uppercase;">
+                        <option value="all">SEMUA PENGELOLA</option>
+                    </select>
+                    <select id="sort-data" class="form-select text-xs" style="width: auto;">
+                        <option value="views_desc">KENAIKAN VIEWS ↑</option>
+                        <option value="views_month_desc">TOTAL VIEWS TERTINGGI</option>
+                        <option value="asli">URUTAN ASLI</option>
+                        <option value="subs_desc">KENAIKAN SUBS ↑</option>
+                    </select>
+                    <button id="btn-reset" class="btn btn-pill text-xs"><i class="fas fa-times"></i> RESET FILTER</button>
+                </div>
+            </div>
+
+            <div class="table-container" style="flex-grow: 1;">
+                <div id="chart-wrapper" class="chart-container">
+                    <canvas id="dashboardChart"></canvas>
+                </div>
+                
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">NO</th>
+                            <th>NAMA CHANNEL</th>
+                            <th style="text-align: center;">LINK</th>
+                            <th>SUBSCRIBERS</th>
+                            <th>TOTAL VIEWS</th>
+                            <th style="text-align: center;">VIDEO</th>
+                            <th>PENGELOLA</th>
+                            <th style="text-align: center;">MONET</th>
+                            <th style="text-align: center; padding-right: 1.5rem;">EDIT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+                
+                <div id="data-grid" class="cards-container hidden"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Form Tambah/Edit -->
+    <div id="modal-form" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 700px; background: var(--bg-color); border: 1px solid var(--panel-border); border-radius: 1rem;">
+            <div class="modal-header" style="border-bottom: 1px solid var(--panel-border); padding: 1.5rem;">
+                <div>
+                    <p class="text-accent font-bold" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">DATA CHANNEL</p>
+                    <h3 id="modal-title" class="font-bold text-xl" style="color: white;">TAMBAH CHANNEL BARU</h3>
+                </div>
+                <button class="btn" onclick="window.closeModal('modal-form')" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border-radius: 0.5rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form id="item-form" style="display: contents;">
+                <input type="hidden" id="item-id">
+                <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; max-height: 70vh; display: flex; flex-direction: column; width: 100%;">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="flex justify-between items-center">
+                                NAMA CHANNEL
+                                <button type="button" class="btn btn-pill" style="padding: 2px 6px; font-size: 0.6rem;" onclick="window.copyToClipboard('item-title')" title="Salin"><i class="fas fa-copy"></i> SALIN</button>
+                            </label>
+                            <input type="text" id="item-title" required placeholder="NAMA CHANNEL" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="flex justify-between items-center">
+                                LINK CHANNEL / PROFIL
+                                <button type="button" class="btn btn-pill" style="padding: 2px 6px; font-size: 0.6rem;" onclick="window.copyToClipboard('item-link')" title="Salin"><i class="fas fa-copy"></i> SALIN</button>
+                            </label>
+                            <input type="text" id="item-link" class="case-sensitive" placeholder="HTTPS://YOUTUBE.COM/@HANDLE">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="flex justify-between items-center">
+                                ID CHANNEL
+                                <button type="button" class="btn btn-pill" style="padding: 2px 6px; font-size: 0.6rem;" onclick="window.copyToClipboard('item-channelId')" title="Salin"><i class="fas fa-copy"></i> SALIN</button>
+                            </label>
+                            <input type="text" id="item-channelId" class="case-sensitive" placeholder="UC...">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="flex justify-between items-center">
+                                NAMA PENGELOLA
+                                <button type="button" class="btn btn-pill" style="padding: 2px 6px; font-size: 0.6rem;" onclick="window.copyToClipboard('item-pengelola')" title="Salin"><i class="fas fa-copy"></i> SALIN</button>
+                            </label>
+                            <input type="text" id="item-pengelola" placeholder="NAMA PENGELOLA" oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                        <div class="form-group full-width"><label>MONETISASI</label>
+                            <select id="item-monet">
+                                <option value="Belum">NO — BELUM MONETISASI</option>
+                                <option value="Sudah">YES — SUDAH MONETISASI</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width"><label>CATATAN PRIBADI</label><textarea id="item-notes" rows="3" placeholder="CATATAN, INFO TAMBAHAN, STRATEGI, DLL..." oninput="this.value = this.value.toUpperCase()"></textarea></div>
+
+                        <div style="display: none;">
+                            <input type="text" id="item-subs"><input type="text" id="item-views"><input type="number" id="item-video">
+                            <input type="number" id="item-subsGrowth" value="0"><input type="number" id="item-viewGrowth" value="0">
+                            <input type="checkbox" id="item-topViews"><input type="checkbox" id="item-topSubs">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-top: 1px solid var(--panel-border); gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn" style="padding: 0.6rem 1.5rem; background: rgba(255,255,255,0.05); color: #d1d5db; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; font-size: 0.875rem;" onclick="window.closeModal('modal-form')">BATAL</button>
+                    <button type="submit" class="btn active" style="padding: 0.6rem 1.5rem; background: #38bdf8; color: #0f172a; font-weight: 600; border-radius: 0.5rem; border: none; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-save"></i> SIMPAN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Pengaturan -->
+    <div id="modal-settings" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div>
+                    <p class="text-accent font-bold" style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.25rem;">MANAJEMEN DATA</p>
+                    <h3 class="font-bold text-xl"><i class="fas fa-database"></i> BACKUP / RESTORE</h3>
+                </div>
+                <button class="btn" onclick="window.closeModal('modal-settings')" style="background: transparent; color: var(--text-muted); border: 1px solid var(--panel-border); border-radius: 0.5rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body" style="display: block;">
+                 <div class="settings-card">
+                    <h4 class="font-bold text-sm mb-4"><i class="fas fa-download text-xs"></i> EKSPOR DATA LOKAL</h4>
+                    <p class="text-xs text-muted mb-4">SIMPAN DATA ANDA SEBAGAI FILE JSON UNTUK BACKUP.</p>
+                    <button onclick="window.exportData()" class="btn w-full" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid #38bdf8; padding: 0.75rem; border-radius: 0.5rem;"><i class="fas fa-file-export"></i> DOWNLOAD DATA (JSON)</button>
+                </div>
+                 <div class="settings-card">
+                    <h4 class="font-bold text-sm mb-4"><i class="fas fa-upload text-xs"></i> IMPOR DATA LOKAL</h4>
+                    <p class="text-xs text-muted mb-4">KEMBALIKAN DATA (RESTORE) DARI FILE JSON.</p>
+                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="window.importData(event)">
+                    <button onclick="document.getElementById('import-file').click()" class="btn w-full" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 0.75rem; border-radius: 0.5rem;"><i class="fas fa-file-import"></i> PILIH FILE JSON</button>
+                </div>
+                <div class="settings-card">
+                    <h4 class="font-bold text-sm mb-4"><i class="fas fa-file-excel text-xs"></i> EKSPOR KE EXCEL (XLSX)</h4>
+                    <p class="text-xs text-muted mb-4">DOWNLOAD NAMA, PENGELOLA, LINK, DAN ID CHANNEL KE FORMAT EXCEL.</p>
+                    <div class="form-group mb-4">
+                        <select id="export-excel-filter" class="form-select text-xs" style="background-color: rgba(0,0,0,0.3); border-color: var(--panel-border);">
+                            <option value="filtered">EKSPOR HANYA DATA TERFILTER (YANG TAMPIL DI TABEL)</option>
+                            <option value="all">EKSPOR SEMUA DATA CHANNEL KESELURUHAN</option>
+                        </select>
+                    </div>
+                    <button onclick="window.exportExcel()" class="btn w-full" style="background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid #22c55e; padding: 0.75rem; border-radius: 0.5rem;"><i class="fas fa-file-excel"></i> DOWNLOAD EXCEL (XLSX)</button>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-pill" style="padding: 0.5rem 1.5rem; background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--panel-border);" onclick="window.closeModal('modal-settings')">TUTUP</button></div>
+        </div>
+    </div>
+
+    <!-- Modal Cari YouTube -->
+    <div id="modal-search-yt" class="modal-overlay hidden" style="flex-direction: column; justify-content: center; align-items: center;">
+        
+        <div class="modal-content" style="position: relative; max-width: 900px; width: 100%; background: var(--bg-color); border: 1px solid var(--panel-border); border-radius: 1.5rem; padding: 2rem;">
+            
+            <style>
+                @keyframes fadeInAlertYT { 
+                    from { opacity: 0; transform: translate(-50%, -15px); } 
+                    to { opacity: 1; transform: translate(-50%, 0); } 
+                }
+            </style>
+            <div id="search-yt-alert" class="hidden" style="position: absolute; top: -3.5rem; left: 50%; transform: translateX(-50%); width: fit-content; padding: 0.5rem 1.25rem; background: rgba(26, 31, 41, 0.95); border: 1px solid rgba(239, 68, 68, 0.5); color: #ef4444; border-radius: 999px; font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; backdrop-filter: blur(10px); animation: fadeInAlertYT 0.2s ease-out forwards; z-index: 10000; white-space: nowrap;">
+            </div>
+
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <p class="font-bold text-accent" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">AUTO-FETCH YOUTUBE</p>
+                    <h2 class="font-bold text-2xl" style="color: white;">CARI CHANNEL YOUTUBE</h2>
+                </div>
+                <button class="btn" onclick="window.closeModal('modal-search-yt')" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--panel-border); border-radius: 0.5rem; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="flex items-center gap-4 flex-wrap">
+                <div style="flex-grow: 1; position: relative; border: 1px solid var(--primary-accent); border-radius: 999px; display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 0.25rem 0.25rem 0.25rem 1.5rem;">
+                    <i class="fas fa-search text-muted" style="font-size: 1.1rem; margin-right: 0.75rem;"></i>
+                    <input type="text" id="yt-search-input" class="case-sensitive" autocomplete="new-password" name="yt_search_input_random_z99" onkeypress="if(event.key === 'Enter') window.searchYouTubeChannel()" placeholder="HTTPS://YOUTUBE.COM/@HANDLE ATAU NAMA CHANNEL..." style="flex-grow: 1; background: transparent; border: none; outline: none; color: white; font-size: 1rem; padding: 0.75rem 0;">
+                </div>
+                <button id="btn-yt-search" onclick="window.searchYouTubeChannel()" class="btn" style="background: var(--primary-accent); color: #1a160c; font-weight: bold; font-size: 1rem; padding: 0.75rem 2rem; border-radius: 999px; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.2);">
+                    <i class="fas fa-search text-sm"></i> CARI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="modal-confirm" class="modal-overlay hidden" style="z-index: 100000; flex-direction: column; justify-content: center; align-items: center;">
+        <div class="modal-content" style="max-width: 350px; background: var(--bg-color); border: 1px solid var(--panel-border); border-radius: 1.5rem; padding: 2rem; text-align: center;">
+            <div style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"><i class="fas fa-trash-alt"></i></div>
+            <h3 class="font-bold text-xl mb-2" style="color: white;">Hapus Channel?</h3>
+            <p class="text-muted text-sm mb-6">Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapusnya?</p>
+            <div class="flex gap-3 justify-center">
+                <button class="btn" onclick="window.closeModal('modal-confirm')" style="padding: 0.6rem 1.5rem; background: rgba(255,255,255,0.05); color: #d1d5db; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; font-weight: 600;">BATAL</button>
+                <button class="btn" onclick="window.executeDelete()" style="padding: 0.6rem 1.5rem; background: #ef4444; color: white; border-radius: 0.5rem; font-weight: 600; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">HAPUS</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+        import { initializeFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tnc7-management';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1hxTceWANgQU8vwKpXDCJABvYpWQQNmk",
+            authDomain: "tnc7-visualizer.firebaseapp.com",
+            projectId: "tnc7-visualizer",
+            storageBucket: "tnc7-visualizer.firebasestorage.app",
+            messagingSenderId: "1098792876538",
+            appId: "1:1098792876538:web:28304ee128f7d156190c43"
+        };
+        
+        let app, db, auth;
+        let userId = null;
+        let unsubscribeSettings = null;
+        let unsubscribeChannels = null;
+
+        try {
+            if (firebaseConfig.apiKey.includes("PASTE_API_KEY")) {
+                console.warn("⚠️ Firebase Offline Mode: API Key belum dimasukkan. Aplikasi berjalan secara LOKAL.");
+            } else {
+                app = initializeApp(firebaseConfig);
+                db = initializeFirestore(app, {
+                    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+                });
+                auth = getAuth(app);
+            }
+        } catch (e) {
+            console.warn("Firebase initialization failed, falling back to local only mode.", e);
+        }
+
+        let state = { items: [], theme: 'dark', isLoggedIn: true, isCloudConnected: false, viewMode: 'table', showChart: false };
+        let dashboardChartInstance = null;
+        let notepadTimeout = null;
+        const DEFAULT_API_KEY = "AIzaSyDJbN1UQy17B_hqVTQE4zNOpJJZFqh2eMc";
+        const el = (id) => document.getElementById(id);
+        
+        let currentRenderLimit = 50; 
+        const RENDER_CHUNK = 50;
+        let currentFilteredData = [];
+        
+        const formatNumberGlobal = (num) => {
+            if (num >= 1000000) return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1).replace('.0', '') + 'K';
+            return num.toString();
+        };
+
+        const parseViewsStr = (viewsStr) => {
+            if (!viewsStr) return 0;
+            let val = viewsStr.toString().toUpperCase().replace(/,/g, '');
+            let multiplier = 1;
+            if (val.endsWith('M')) { multiplier = 1000000; val = val.slice(0, -1); } 
+            else if (val.endsWith('K')) { multiplier = 1000; val = val.slice(0, -1); }
+            const num = parseFloat(val);
+            return isNaN(num) ? 0 : num * multiplier;
+        };
+
+        async function silentAutoSync() {
+            if (!state.items || state.items.length === 0) return;
+            
+            const autoSyncBadge = el('auto-sync-badge');
+            const originalHtml = autoSyncBadge ? autoSyncBadge.innerHTML : '';
+            if(autoSyncBadge && !autoSyncBadge.classList.contains('hidden')) {
+                autoSyncBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span class="status-text">SYNCING...</span>';
+            }
+
+            const API_KEY = DEFAULT_API_KEY; 
+            const todayStr = new Date().toLocaleDateString('en-CA'); 
+            
+            const validItems = state.items.filter(i => i.channelId && i.channelId.startsWith('UC'));
+            
+            let hasChanges = false;
+            for (let i = 0; i < validItems.length; i += 50) {
+                const chunk = validItems.slice(i, i + 50);
+                const ids = chunk.map(item => item.channelId).join(',');
+                
+                try {
+                    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ids}&key=${API_KEY}`);
+                    const data = await res.json();
+                    
+                    if (data.items) {
+                        data.items.forEach(yt => {
+                            const idx = state.items.findIndex(item => item.channelId === yt.id);
+                            if (idx > -1) {
+                                let item = state.items[idx];
+                                const newViews = parseInt(yt.statistics.viewCount) || 0;
+                                const newSubs = parseInt(yt.statistics.subscriberCount) || 0;
+                                const newVideos = parseInt(yt.statistics.videoCount) || 0;
+                                
+                                if (item.lastSyncDate !== todayStr) {
+                                    item.startOfDayViews = parseViewsStr(item.views) || newViews;
+                                    item.startOfDaySubs = parseViewsStr(item.subs) || newSubs;
+                                    item.lastSyncDate = todayStr;
+                                }
+                                
+                                const viewGrowth = newViews - (item.startOfDayViews || 0);
+                                const subsGrowth = newSubs - (item.startOfDaySubs || 0);
+                                const currentViewsParsed = parseViewsStr(item.views);
+                                
+                                let updatedLastUpload = item.lastUploadDate;
+                                if (newVideos > (item.videoCount || 0)) {
+                                    updatedLastUpload = Date.now();
+                                }
+                                
+                                if (currentViewsParsed !== newViews || item.videoCount !== newVideos || item.viewGrowth !== viewGrowth || updatedLastUpload !== item.lastUploadDate) {
+                                    item.views = formatNumberGlobal(newViews);
+                                    item.subs = formatNumberGlobal(newSubs);
+                                    item.videoCount = newVideos;
+                                    item.viewGrowth = viewGrowth > 0 ? viewGrowth : 0; 
+                                    item.subsGrowth = subsGrowth > 0 ? subsGrowth : 0;
+                                    item.lastUploadDate = updatedLastUpload;
+                                    
+                                    state.items[idx] = item;
+                                    hasChanges = true;
+                                    
+                                    if (state.isCloudConnected && db && userId) {
+                                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', item.id);
+                                        setDoc(docRef, item, {merge: true}).catch(e=>{});
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (err) { console.error("Auto Sync Error:", err); }
+            }
+
+            if (hasChanges) {
+                saveLocalData();
+                renderTable();
+            }
+
+            const lastSyncEl = el('last-sync-time');
+            const nowSync = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            if(lastSyncEl) {
+                lastSyncEl.innerText = `SYNC: ${nowSync}`;
+                lastSyncEl.classList.remove('hidden');
+            }
+
+            if(autoSyncBadge && !autoSyncBadge.classList.contains('hidden')) {
+                autoSyncBadge.innerHTML = originalHtml;
+            }
+        }
+
+        async function initApp() {
+            setupPWA();
+            setupEventListeners();
+            loadLocalData();
+            
+            const savedTheme = localStorage.getItem('TNC7_THEME');
+            let initialTheme = savedTheme ? savedTheme : 'dark';
+            
+            applyTheme(initialTheme);
+
+            renderTable();
+            updateFilters();
+
+            if (auth) {
+                try {
+                    await signInAnonymously(auth);
+                    
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            state.isCloudConnected = true;
+                            setCloudOnline();
+                            startSyncingSettings();
+                            startSyncingChannels();
+                        } else {
+                            userId = null;
+                            state.isCloudConnected = false;
+                            setCloudOffline();
+                            if (unsubscribeChannels) unsubscribeChannels();
+                        }
+                    });
+                } catch(e) {
+                    console.warn("⚠️ Autentikasi Cloud gagal, menggunakan mode lokal.");
+                    setCloudOffline();
+                }
+            } else {
+                setCloudOffline();
+            }
+
+            setTimeout(silentAutoSync, 3000);
+            setInterval(silentAutoSync, 5 * 60 * 1000);
+        }
+
+        function startSyncingSettings() {
+            if (!userId || !db) return;
+            const settingsDocRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'preferences');
+            if (unsubscribeSettings) unsubscribeSettings();
+            unsubscribeSettings = onSnapshot(settingsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.theme && data.theme !== state.theme) {
+                        applyTheme(data.theme);
+                        showToast(`Tema disinkronkan: ${data.theme.toUpperCase()}`);
+                    }
+                }
+            }, (error) => console.error("Error syncing settings: ", error));
+        }
+
+        function startSyncingChannels() {
+            if (!userId || !db) return;
+            const channelsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'channels');
+            if (unsubscribeChannels) unsubscribeChannels();
+            unsubscribeChannels = onSnapshot(channelsColRef, (snapshot) => {
+                const cloudItems = [];
+                snapshot.forEach(docSnap => cloudItems.push(docSnap.data()));
+                if (cloudItems.length > 0 || !snapshot.metadata.fromCache) {
+                    state.items = cloudItems.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    saveLocalData();
+                    renderTable();
+                    updateFilters();
+                }
+            }, (error) => console.error("Error syncing channels: ", error));
+        }
+
+        async function saveThemeToCloud(theme) {
+            if (!userId || !db) return;
+            try {
+                const settingsDocRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'preferences');
+                await setDoc(settingsDocRef, { theme: theme }, { merge: true });
+            } catch (error) { console.error("Gagal menyimpan tema ke cloud: ", error); }
+        }
+
+        function applyTheme(theme) {
+            state.theme = theme; 
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('TNC7_THEME', theme);
+            
+            const themeBtns = document.querySelectorAll('.theme-toggle-btn');
+            themeBtns.forEach(btn => {
+                if (theme === 'terang') btn.innerHTML = '<i class="fas fa-sun" style="color: #f59e0b;"></i>';
+                else if (theme === 'kuning') btn.innerHTML = '<i class="fas fa-bolt" style="color: #eab308;"></i>';
+                else btn.innerHTML = '<i class="fas fa-moon" style="color: #60a5fa;"></i>';
+            });
+        }
+
+        window.setTheme = function(theme) {
+            applyTheme(theme);
+            if (state.isCloudConnected) saveThemeToCloud(theme);
+        };
+
+        window.cycleTheme = function() {
+            const themes = ['dark', 'terang', 'kuning'];
+            let currentIdx = themes.indexOf(state.theme);
+            if (currentIdx === -1) currentIdx = 0;
+            let nextTheme = themes[(currentIdx + 1) % themes.length];
+            window.setTheme(nextTheme);
+            showToast('TEMA: ' + nextTheme.toUpperCase());
+        };
+
+        function setCloudOnline() {
+            const ind = el('cloud-status-indicator');
+            if(ind) {
+                ind.className = 'cloud-status';
+                ind.innerHTML = '<i class="fas fa-cloud"></i> <span class="status-text">CLOUD SYNC AKTIF</span>';
+            }
+            const badge = el('auto-sync-badge');
+            if(badge) badge.classList.remove('hidden');
+        }
+        
+        function setCloudOffline() {
+            const ind = el('cloud-status-indicator');
+            if(ind) {
+                ind.className = 'cloud-status offline';
+                ind.innerHTML = '<i class="fas fa-cloud-slash"></i> <span class="status-text">LOKAL MODE</span>';
+            }
+            const badge = el('auto-sync-badge');
+            if(badge) badge.classList.add('hidden');
+        }
+
+        function loadLocalData() {
+            try {
+                const storedChannels = localStorage.getItem('tnc7_channels');
+                if (storedChannels) state.items = JSON.parse(storedChannels);
+            } catch(e) { console.error("Gagal load lokal", e); }
+        }
+
+        function saveLocalData() {
+            try { localStorage.setItem('tnc7_channels', JSON.stringify(state.items)); } 
+            catch(e) { console.error("Gagal save lokal", e); }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = el('toast');
+            el('toast-msg').innerText = msg;
+            toast.className = isError ? 'show error' : 'show';
+            toast.querySelector('i').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            
+            if(window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => toast.className = '', isError ? 5000 : 3000);
+        }
+
+        window.openModal = function(id) { el(id).classList.remove('hidden'); };
+        window.closeModal = function(id) { el(id).classList.add('hidden'); };
+        
+        window.copyToClipboard = function(elementId) {
+            const copyText = el(elementId);
+            if (copyText && copyText.value) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(copyText.value).then(() => {
+                        showToast('BERHASIL DISALIN');
+                    }).catch(err => {
+                        console.error('Gagal menyalin:', err);
+                        fallbackCopyTextToClipboard(copyText);
+                    });
+                } else {
+                    fallbackCopyTextToClipboard(copyText);
+                }
+            } else {
+                 showToast('KOLOM KOSONG, TIDAK ADA YANG DISALIN', true);
+            }
+        };
+
+        function fallbackCopyTextToClipboard(inputElement) {
+            inputElement.select();
+            inputElement.setSelectionRange(0, 99999);
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('BERHASIL DISALIN');
+                } else {
+                    showToast('GAGAL MENYALIN', true);
+                }
+            } catch (err) {
+                console.error('Fallback: Gagal menyalin', err);
+                showToast('GAGAL MENYALIN', true);
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        const optimizedRender = debounce(() => {
+            currentRenderLimit = RENDER_CHUNK;
+            requestAnimationFrame(() => renderTable());
+        }, 150);
+
+        function setupEventListeners() {
+            document.addEventListener('contextmenu', event => event.preventDefault());
+
+            const tableContainer = document.querySelector('.table-container');
+            if (tableContainer) {
+                tableContainer.addEventListener('scroll', () => {
+                    if (tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 100) {
+                        if (currentRenderLimit < currentFilteredData.length) {
+                            currentRenderLimit += RENDER_CHUNK;
+                            requestAnimationFrame(() => renderTable(true));
+                        }
+                    }
+                });
+            }
+
+            ['search-input', 'filter-monet', 'filter-pengelola', 'sort-data'].forEach(id => { 
+                el(id).addEventListener('input', optimizedRender); 
+            });
+            
+            el('btn-reset').addEventListener('click', () => {
+                el('search-input').value = ''; 
+                el('filter-monet').value = 'all'; 
+                el('filter-pengelola').value = 'all'; 
+                el('sort-data').value = 'views_desc';
+                currentRenderLimit = RENDER_CHUNK;
+                optimizedRender();
+            });
+
+            el('item-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = el('item-id').value; 
+                
+                const inputChannelId = el('item-channelId').value.trim();
+                const inputLink = el('item-link').value.trim();
+                const inputTitle = el('item-title').value.trim().toUpperCase();
+
+                const isDuplicate = state.items.some(item => {
+                    if (id && item.id === id) return false;
+                    const isIdSame = inputChannelId !== '' && item.channelId === inputChannelId;
+                    const isLinkSame = inputLink !== '' && item.link === inputLink;
+                    const isTitleSame = inputTitle !== '' && item.title === inputTitle;
+                    return isIdSame || isLinkSame || isTitleSame;
+                });
+
+                if (isDuplicate) {
+                    showToast('GAGAL: CHANNEL SUDAH ADA DI DATABASE!', true);
+                    return;
+                }
+
+                const docId = id || Date.now().toString();
+                const newItem = {
+                    id: docId, 
+                    title: el('item-title').value, 
+                    channelId: el('item-channelId').value,
+                    link: el('item-link').value, 
+                    pengelola: el('item-pengelola').value.toUpperCase(),
+                    subs: el('item-subs').value || '0', 
+                    subsGrowth: parseInt(el('item-subsGrowth').value) || 0,
+                    views: el('item-views').value || '0', 
+                    viewGrowth: parseInt(el('item-viewGrowth').value) || 0,
+                    videoCount: parseInt(el('item-video').value) || 0, 
+                    monet: el('item-monet').value, 
+                    notes: el('item-notes').value,
+                    badges: { topViews: el('item-topViews').checked, topSubs: el('item-topSubs').checked },
+                    createdAt: id ? (state.items.find(i => i.id === id)?.createdAt || Date.now()) : Date.now(),
+                    startOfDayViews: id ? (state.items.find(i => i.id === id)?.startOfDayViews || null) : null,
+                    startOfDaySubs: id ? (state.items.find(i => i.id === id)?.startOfDaySubs || null) : null,
+                    lastSyncDate: id ? (state.items.find(i => i.id === id)?.lastSyncDate || null) : null,
+                    lastUploadDate: id ? (state.items.find(i => i.id === id)?.lastUploadDate || Date.now()) : Date.now()
+                };
+
+                if(id) {
+                    const idx = state.items.findIndex(i => i.id === id);
+                    if(idx > -1) state.items[idx] = newItem;
+                } else {
+                    state.items.unshift(newItem);
+                }
+                
+                saveLocalData();
+
+                if (state.isCloudConnected && db && userId) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', docId);
+                    setDoc(docRef, newItem).catch(err => console.error("Gagal simpan ke cloud", err));
+                }
+
+                renderTable();
+                window.closeModal('modal-form'); 
+                showToast('DATA BERHASIL DISIMPAN');
+            });
+        }
+
+        function updateFilters() {
+            const selectP = el('filter-pengelola');
+            const uniqueP = [...new Set(state.items.map(i => i.pengelola).filter(Boolean))];
+            selectP.innerHTML = '<option value="all">SEMUA PENGELOLA</option>' + uniqueP.map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+
+        window.toggleViewMode = function() {
+            state.viewMode = state.viewMode === 'table' ? 'grid' : 'table';
+            const btn = el('btn-view-toggle');
+            if (state.viewMode === 'grid') {
+                btn.innerHTML = '<i class="fas fa-list"></i> TABEL';
+                btn.classList.add('active');
+            } else {
+                btn.innerHTML = '<i class="fas fa-th"></i> GRID';
+                btn.classList.remove('active');
+            }
+            renderTable();
+        };
+
+        window.toggleChart = function() {
+            state.showChart = !state.showChart;
+            const wrapper = el('chart-wrapper');
+            const btn = el('btn-chart-toggle');
+            if(state.showChart) {
+                wrapper.classList.add('show');
+                if (btn) btn.classList.add('active');
+            } else {
+                wrapper.classList.remove('show');
+                if (btn) btn.classList.remove('active');
+            }
+            renderTable();
+        };
+
+        function updateChartData(data) {
+            if (!state.showChart) return;
+            const ctx = document.getElementById('dashboardChart');
+            if (!ctx) return;
+            
+            const chartData = data.slice(0, 10);
+            const labels = chartData.map(d => d.title.length > 12 ? d.title.substring(0,12)+'...' : d.title);
+            const viewsData = chartData.map(d => parseViewsStr(d.views));
+
+            if (dashboardChartInstance) {
+                dashboardChartInstance.data.labels = labels;
+                dashboardChartInstance.data.datasets[0].data = viewsData;
+                dashboardChartInstance.update();
+                return;
+            }
+
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            
+            dashboardChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Views',
+                        data: viewsData,
+                        backgroundColor: 'rgba(250, 204, 21, 0.7)',
+                        borderColor: 'rgba(250, 204, 21, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: '#e2e8f0', font: { weight: 'bold' } } }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { callback: function(value) { return formatNumberGlobal(value); } }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderTable(isAppend = false) {
+            if(!state.isLoggedIn) return;
+            
+            const tbody = el('table-body');
+            const gridEl = el('data-grid');
+            
+            if (!isAppend) {
+                const sq = el('search-input').value.toLowerCase();
+                const fm = el('filter-monet').value;
+                const fp = el('filter-pengelola').value;
+                const sort = el('sort-data').value;
+
+                currentFilteredData = state.items.filter(i => {
+                    const ms = (i.title && i.title.toLowerCase().includes(sq)) || (i.channelId && i.channelId.toLowerCase().includes(sq));
+                    const mm = fm === 'all' ? true : (fm === 'yes' ? i.monet === 'Sudah' : i.monet !== 'Sudah');
+                    const mp = fp === 'all' ? true : i.pengelola === fp;
+                    return ms && mm && mp;
+                });
+
+                if(sort === 'views_desc') currentFilteredData.sort((a,b) => (b.viewGrowth||0) - (a.viewGrowth||0));
+                if(sort === 'subs_desc') currentFilteredData.sort((a,b) => (b.subsGrowth||0) - (a.subsGrowth||0));
+                if(sort === 'asli') currentFilteredData.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                if(sort === 'views_month_desc') {
+                    currentFilteredData.sort((a,b) => {
+                        const viewsA = parseViewsStr(a.views);
+                        const viewsB = parseViewsStr(b.views);
+                        return viewsB - viewsA;
+                    });
+                }
+                
+                const now = Date.now();
+                const newChannelsCount = state.items.filter(i => (now - (i.createdAt || 0)) <= 86400000).length;
+
+                el('stat-total').innerText = state.items.length;
+                el('stat-monet').innerText = state.items.filter(i => i.monet === 'Sudah').length;
+                if(el('stat-aktif')) el('stat-aktif').innerText = state.items.filter(i => i.monet !== 'Sudah').length; 
+                if(el('stat-new')) el('stat-new').innerText = newChannelsCount;
+                
+                updateChartData(currentFilteredData);
+            }
+
+            if(currentFilteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" style="padding: 2rem;">BELUM ADA DATA...</td></tr>`;
+                gridEl.innerHTML = `<div class="text-center text-muted w-full" style="padding: 2rem; grid-column: 1 / -1;">BELUM ADA DATA...</div>`;
+                return;
+            }
+
+            const sortMode = el('sort-data').value;
+            let top3ViewsIds = [];
+            if ((sortMode === 'views_desc' || sortMode === 'views_month_desc') && currentFilteredData.length > 0) {
+                top3ViewsIds = currentFilteredData.slice(0, 3).map(item => item.id);
+            }
+
+            const startIndex = isAppend ? currentRenderLimit - RENDER_CHUNK : 0;
+            const dataToRender = currentFilteredData.slice(startIndex, currentRenderLimit);
+
+            const gridHtml = dataToRender.map((item, idx) => {
+                const actualIndex = startIndex + idx;
+                const lastUp = item.lastUploadDate || item.createdAt || Date.now();
+                const daysIdle = (Date.now() - lastUp) / (1000 * 60 * 60 * 24);
+                let numClass = 'text-muted';
+                if (daysIdle >= 2) numClass = 'num-danger';
+                else if (daysIdle >= 1) numClass = 'num-warning';
+
+                let badge = '';
+                
+                let sG = item.subsGrowth > 0 ? `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-emerald font-bold" style="font-size: 0.7rem;">▲+${item.subsGrowth.toLocaleString('id-ID')}</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>` : `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-muted font-bold" style="font-size: 0.7rem;">0</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>`;
+                
+                let vG = '';
+                if (item.viewGrowth > 0) {
+                    vG = `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-emerald font-bold" style="font-size: 0.7rem;">▲+${item.viewGrowth.toLocaleString('id-ID')}</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>`;
+                } else if (item.viewGrowth === 0 && item.views && item.views !== '0' && item.views !== '') {
+                     vG = `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-muted font-bold" style="font-size: 0.7rem;">0</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>`;
+                } else {
+                    vG = `<span class="text-muted">—</span>`;
+                }
+
+                let monetHtml = item.monet === 'Sudah' ? `<div style="width:16px;height:16px;border-radius:50%;background:#10b981;color:white;display:flex;align-items:center;justify-content:center;margin:auto;font-size:9px;"><i class="fas fa-dollar-sign"></i></div>` : `<div style="width:16px;height:16px;border-radius:50%;border:1px solid var(--panel-border);color:var(--text-muted);display:flex;align-items:center;justify-content:center;margin:auto;font-size:9px;opacity:0.5;"><i class="fas fa-dollar-sign"></i></div>`;
+                let linkUrl = item.link && item.link.trim() !== '' ? item.link : (item.channelId ? `https://youtube.com/channel/${item.channelId}` : '#');
+
+                return `
+                    <div class="card-item">
+                        <div class="card-header">
+                            <div>
+                                <div class="font-bold text-sm mb-0.5"><span class="text-xs ${numClass}">#${actualIndex+1}</span> ${item.title}</div>
+                                <div>${badge}</div>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="window.editItem('${item.id}')" class="btn btn-pill" style="padding: 4px; border-radius: 6px;"><i class="fas fa-edit" style="font-size: 0.65rem;"></i></button>
+                                <button onclick="window.deleteItem('${item.id}')" class="btn btn-pill text-red" style="padding: 4px; border-radius: 6px;"><i class="fas fa-trash" style="font-size: 0.65rem;"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body mt-1">
+                            <div class="card-stat" style="padding: 0.5rem;">
+                                <div class="text-[0.6rem] text-muted mb-0.5 font-bold">SUBSCRIBERS</div>
+                                <div class="font-bold text-sm">${item.subs||'0'}</div>
+                                <div style="margin-top:2px;">${sG}</div>
+                            </div>
+                            <div class="card-stat" style="padding: 0.5rem;">
+                                <div class="text-[0.6rem] text-muted mb-0.5 font-bold">TOTAL VIEWS</div>
+                                <div class="font-bold text-sm">${item.views||'0'}</div>
+                                <div style="margin-top:2px;">${vG}</div>
+                            </div>
+                            <div class="card-stat flex justify-center items-center" style="grid-column: span 2; padding: 0.5rem; gap: 0.5rem;">
+                                <span class="text-[0.6rem] text-muted font-bold">MONETISASI:</span> 
+                                ${monetHtml}
+                            </div>
+                        </div>
+                        <div class="mt-1 flex gap-1">
+                            ${linkUrl !== '#' ? `<a href="${linkUrl}" target="_blank" class="btn flex-1 text-[0.65rem]" style="background:rgba(255,255,255,0.05); border: 1px solid var(--panel-border); border-radius:0.4rem; padding: 0.4rem;"><i class="fab fa-youtube text-red"></i> KUNJUNGI</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const tableHtml = dataToRender.map((item, idx) => {
+                const actualIndex = startIndex + idx;
+                const lastUp = item.lastUploadDate || item.createdAt || Date.now();
+                const daysIdle = (Date.now() - lastUp) / (1000 * 60 * 60 * 24);
+                let numClass = 'text-muted';
+                if (daysIdle >= 2) numClass = 'num-danger';
+                else if (daysIdle >= 1) numClass = 'num-warning';
+
+                let badge = '';
+                if(item.badges?.topSubs) badge += `<span class="badge-subs" style="font-size: 0.55rem; padding: 2px 6px;"><i class="fas fa-chart-line"></i> Top Subs</span>`;
+
+                let sG = item.subsGrowth > 0 ? `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-emerald font-bold" style="font-size: 0.7rem;">▲+${item.subsGrowth.toLocaleString('id-ID')}</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>` : `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-muted font-bold" style="font-size: 0.7rem;">0</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>`;
+                let vG = '';
+                if (item.viewGrowth > 0) vG = `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-emerald font-bold" style="font-size: 0.7rem;">▲+${item.viewGrowth.toLocaleString('id-ID')}</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>`;
+                else if (item.viewGrowth === 0 && item.views && item.views !== '0' && item.views !== '') vG = `<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 1px;"><span class="text-muted font-bold" style="font-size: 0.7rem;">0</span><span class="text-muted" style="font-size: 0.55rem; font-weight: 500; text-transform: lowercase;">(1hr)</span></div>`;
+                else vG = `<span class="text-muted">—</span>`;
+
+                let monetHtml = item.monet === 'Sudah' ? `<div style="width:16px;height:16px;border-radius:50%;background:#10b981;color:white;display:flex;align-items:center;justify-content:center;margin:auto;font-size:9px;"><i class="fas fa-dollar-sign"></i></div>` : `<div style="width:16px;height:16px;border-radius:50%;border:1px solid var(--panel-border);color:var(--text-muted);display:flex;align-items:center;justify-content:center;margin:auto;font-size:9px;opacity:0.5;"><i class="fas fa-dollar-sign"></i></div>`;
+                let linkUrl = item.link && item.link.trim() !== '' ? item.link : (item.channelId ? `https://youtube.com/channel/${item.channelId}` : '#');
+
+                return `
+                    <tr>
+                        <td class="text-center text-xs"><span class="${numClass}">${actualIndex+1}</span></td>
+                        <td><div class="font-bold text-xs" style="line-height: 1;">${item.title}</div><div style="margin-top: 2px;">${badge}</div></td>
+                        <td class="text-center">${linkUrl !== '#' ? `<a href="${linkUrl}" target="_blank" class="text-accent" style="font-size: 0.6rem; font-weight: bold; text-decoration: none;">BUKA <i class="fas fa-external-link-alt"></i></a>` : '-'}</td>
+                        <td><div class="font-bold text-xs" style="line-height: 1;">${item.subs||'0'}</div>${sG}</td>
+                        <td><div class="font-bold text-xs" style="line-height: 1;">${item.views||'0'}</div>${vG}</td>
+                        <td class="text-center font-semibold text-xs">${item.videoCount}</td>
+                        <td class="text-[0.65rem] text-muted font-semibold" style="text-transform: uppercase;">${item.pengelola||'-'}</td>
+                        <td class="text-center">${monetHtml}</td>
+                        <td style="padding-right: 0.5rem;">
+                            <div class="flex gap-1 justify-end">
+                                <button onclick="window.editItem('${item.id}')" class="btn btn-pill" style="padding: 2px 6px; font-size: 0.6rem;">EDIT</button>
+                                <button onclick="window.deleteItem('${item.id}')" class="btn btn-pill text-red" style="padding: 2px 6px; font-size: 0.6rem;"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (isAppend) {
+                tbody.insertAdjacentHTML('beforeend', tableHtml);
+                gridEl.insertAdjacentHTML('beforeend', gridHtml);
+            } else {
+                tbody.innerHTML = tableHtml;
+                gridEl.innerHTML = gridHtml;
+            }
+        }
+
+        window.editItem = function(id) {
+            el('item-form').reset(); 
+            el('item-id').value = '';
+            if (id) {
+                const item = state.items.find(i => i.id === id);
+                if (item) {
+                    el('modal-title').innerHTML = 'EDIT DATA CHANNEL'; 
+                    el('item-id').value = item.id;
+                    el('item-title').value = item.title; 
+                    el('item-channelId').value = item.channelId || '';
+                    el('item-link').value = item.link || ''; 
+                    el('item-pengelola').value = item.pengelola || '';
+                    el('item-subs').value = item.subs || ''; 
+                    el('item-subsGrowth').value = item.subsGrowth || 0;
+                    el('item-views').value = item.views || ''; 
+                    el('item-viewGrowth').value = item.viewGrowth || 0;
+                    el('item-video').value = item.videoCount || 0; 
+                    el('item-monet').value = item.monet || 'Belum'; 
+                    el('item-notes').value = item.notes || '';
+                    el('item-topViews').checked = !!item.badges?.topViews; 
+                    el('item-topSubs').checked = !!item.badges?.topSubs;
+                }
+            } else { 
+                el('modal-title').innerHTML = 'TAMBAH CHANNEL BARU'; 
+            }
+            window.openModal('modal-form');
+        };
+
+        let itemToDeleteId = null;
+
+        window.deleteItem = function(id) {
+            itemToDeleteId = id;
+            window.openModal('modal-confirm');
+        };
+
+        window.executeDelete = function() {
+            if (!itemToDeleteId) return;
+            const id = itemToDeleteId;
+            
+            state.items = state.items.filter(i => i.id !== id);
+            saveLocalData();
+
+            if (state.isCloudConnected && db && userId) {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', id);
+                deleteDoc(docRef).catch(err => console.error("Gagal hapus dari cloud", err));
+            }
+
+            renderTable();
+            showToast('DATA BERHASIL DIHAPUS');
+            window.closeModal('modal-confirm');
+            itemToDeleteId = null;
+        };
+
+        window.searchYouTubeChannel = async function() {
+            const query = el('yt-search-input').value.trim();
+            if (!query) return;
+
+            const btn = el('btn-yt-search'); 
+            const originalText = btn.innerHTML;
+            const apiKeyToUse = DEFAULT_API_KEY;
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENCARI...'; 
+            btn.disabled = true;
+
+            let handle = query.includes('@') ? query.split('@')[1].split('/')[0].split('?')[0] : null;
+
+            try {
+                let channelData = null;
+                if (handle) {
+                    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forHandle=${handle}&key=${apiKeyToUse}`);
+                    const data = await res.json(); 
+                    if (data.error) throw new Error(data.error.message);
+                    if (data.items) channelData = data.items[0];
+                } else {
+                    const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(query)}&key=${apiKeyToUse}`);
+                    const searchData = await searchRes.json();
+                    if (searchData.error) throw new Error(searchData.error.message);
+                    
+                    if (searchData.items && searchData.items.length > 0) {
+                        const statRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${searchData.items[0].snippet.channelId}&key=${apiKeyToUse}`);
+                        const statData = await statRes.json(); 
+                        if (statData.items) channelData = statData.items[0];
+                    }
+                }
+
+                if (channelData) {
+                    const isDuplicate = state.items.some(item => 
+                        (channelData.id && item.channelId === channelData.id) || 
+                        (channelData.snippet.title && item.title === channelData.snippet.title.toUpperCase())
+                    );
+
+                    if (isDuplicate) {
+                        const localAlert = document.getElementById('search-yt-alert');
+                        localAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> GAGAL: CHANNEL INI SUDAH ADA DI DATABASE!';
+                        localAlert.classList.remove('hidden');
+                        setTimeout(() => localAlert.classList.add('hidden'), 4000);
+                        return;
+                    }
+
+                    window.closeModal('modal-search-yt'); 
+                    window.editItem(null); 
+                    el('item-title').value = channelData.snippet.title; 
+                    el('item-channelId').value = channelData.id;
+                    el('item-link').value = channelData.snippet.customUrl ? `https://youtube.com/${channelData.snippet.customUrl}` : `https://youtube.com/channel/${channelData.id}`;
+                    el('item-subs').value = formatNumberGlobal(channelData.statistics.subscriberCount);
+                    el('item-views').value = formatNumberGlobal(channelData.statistics.viewCount);
+                    el('item-video').value = channelData.statistics.videoCount;
+                    el('yt-search-input').value = ''; 
+                    showToast('CHANNEL DITEMUKAN!');
+                } else {
+                    const localAlert = document.getElementById('search-yt-alert');
+                    localAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> CHANNEL TIDAK DITEMUKAN.';
+                    localAlert.classList.remove('hidden');
+                    setTimeout(() => localAlert.classList.add('hidden'), 4000);
+                } 
+            } catch (err) { 
+                console.error(err);
+                const localAlert = document.getElementById('search-yt-alert');
+                localAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> KESALAHAN PENCARIAN: ' + err.message;
+                localAlert.classList.remove('hidden');
+                setTimeout(() => localAlert.classList.add('hidden'), 4000);
+            } finally { 
+                btn.innerHTML = originalText; 
+                btn.disabled = false; 
+            }
+        };
+
+        window.exportData = function() {
+            const dataToExport = { channels: state.items, exportDate: new Date().toISOString() };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "SANGITA_BACKUP_" + new Date().getTime() + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            showToast('DATA BERHASIL DIEKSPOR');
+        };
+
+        window.exportExcel = function() {
+            if (typeof XLSX === 'undefined') {
+                showToast('GAGAL: LIBRARY EXCEL BELUM TERLOAD', true);
+                return;
+            }
+
+            const filterType = el('export-excel-filter').value;
+            const dataToExport = filterType === 'filtered' ? currentFilteredData : state.items;
+
+            if (!dataToExport || dataToExport.length === 0) {
+                showToast('TIDAK ADA DATA UNTUK DIEKSPOR', true);
+                return;
+            }
+
+            const excelData = dataToExport.map((item, index) => ({
+                'NO': index + 1,
+                'NAMA CHANNEL': item.title || '-',
+                'PENGELOLA': item.pengelola || '-',
+                'LINK CHANNEL': item.link && item.link.trim() !== '' ? item.link : (item.channelId ? `https://youtube.com/channel/${item.channelId}` : '-'),
+                'ID CHANNEL': item.channelId || '-'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            
+            if(!ws['!autofilter']) {
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+            }
+            
+            ws['!cols'] = [
+                {wch: 5},  // NO
+                {wch: 35}, // NAMA CHANNEL
+                {wch: 25}, // PENGELOLA
+                {wch: 50}, // LINK CHANNEL
+                {wch: 30}  // ID CHANNEL
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data_Channel");
+
+            const fileName = `SANGITA_CHANNEL_${filterType === 'all' ? 'SEMUA' : 'TERFILTER'}_${new Date().getTime()}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showToast('FILE EXCEL BERHASIL DIDOWNLOAD');
+        };
+
+        window.importData = function(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.channels && Array.isArray(imported.channels)) {
+                        let importedCount = 0;
+                        let duplicateCount = 0;
+                        
+                        imported.channels.forEach(newChannel => {
+                            const isDuplicate = state.items.some(existing => {
+                                const isIdSame = newChannel.channelId && newChannel.channelId !== '' && existing.channelId === newChannel.channelId;
+                                const isLinkSame = newChannel.link && newChannel.link !== '' && existing.link === newChannel.link;
+                                const isTitleSame = newChannel.title && newChannel.title !== '' && existing.title === newChannel.title;
+                                return isIdSame || isLinkSame || isTitleSame;
+                            });
+                            
+                            if (!isDuplicate) {
+                                state.items.push(newChannel);
+                                importedCount++;
+                                
+                                if (state.isCloudConnected && db && userId) {
+                                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', newChannel.id);
+                                    setDoc(docRef, newChannel).catch(err => console.error("Gagal simpan ke cloud", err));
+                                }
+                            } else {
+                                duplicateCount++;
+                            }
+                        });
+                        
+                        state.items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                        saveLocalData();
+                        renderTable();
+                        
+                        if (duplicateCount > 0) {
+                            showToast(`IMPOR: ${importedCount} BERHASIL, ${duplicateCount} DUPLIKAT DITOLAK!`, true);
+                        } else {
+                            showToast(`DATA BERHASIL DIIMPOR (${importedCount} CHANNEL BARU)`);
+                        }
+                    }
+                    el('import-file').value = ''; 
+                } catch(err) { showToast('GAGAL MEMBACA FILE JSON: ' + err.message, true); }
+            };
+            reader.readAsText(file);
+        };
+
+        window.onload = () => {
+            setInterval(() => { 
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateString = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+                const clockEl = el('clock');
+                if(clockEl) clockEl.innerText = `${dateString} — ${timeString} WIB`;
+            }, 1000);
+            initApp();
+        };
+
+        function setupPWA() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1f2c'; ctx.beginPath();
+            if(ctx.roundRect) { ctx.roundRect(0, 0, 512, 512, 110); } else { ctx.rect(0,0,512,512); }
+            ctx.fill();
+            ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.moveTo(190, 160); ctx.lineTo(370, 256); ctx.lineTo(190, 352); ctx.fill();
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 65px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('SANGITA', 256, 440);
+            const pngIcon = canvas.toDataURL('image/png');
+
+            const manifest = {
+                "name": "SANGITA MUSIC PRO", 
+                "short_name": "SANGITA",
+                "start_url": ".", 
+                "display": "standalone",
+                "background_color": "#161921", 
+                "theme_color": "#161921",
+                "icons": [
+                    { "src": pngIcon, "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+                    { "src": pngIcon, "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+                ]
+            };
+            
+            const manifestUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+            let link = document.querySelector('link[rel="manifest"]');
+            if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+            link.href = manifestUrl;
+
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', e => self.skipWaiting());
+                    self.addEventListener('activate', e => self.clients.claim());
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(fetch(e.request).catch(() => new Response('SANGITA Offline Mode')));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+            }
+
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault(); 
+                deferredPrompt = e;
+                const installBtn = document.getElementById('btn-install');
+                if(installBtn) { 
+                    installBtn.classList.remove('hidden'); 
+                    installBtn.style.animation = 'pulse 2s infinite'; 
+                }
+            });
+
+            const installBtn = document.getElementById('btn-install');
+            if(installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') installBtn.classList.add('hidden');
+                        deferredPrompt = null;
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
