@@ -778,7 +778,8 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
         import { initializeFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tnc7-management';
+        // MENGUNCI ID APLIKASI SECARA MUTLAK (Mengabaikan id sistem)
+        const appId = 'sangita-music-pro-db-v1';
         
         const firebaseConfig = {
             apiKey: "AIzaSyA1hxTceWANgQU8vwKpXDCJABvYpWQQNmk",
@@ -926,7 +927,7 @@
             setupEventListeners();
             loadLocalData();
             
-            const savedTheme = localStorage.getItem('TNC7_THEME');
+            const savedTheme = localStorage.getItem('SANGITA_THEME');
             let initialTheme = savedTheme ? savedTheme : 'dark';
             
             applyTheme(initialTheme);
@@ -1006,7 +1007,7 @@
         function applyTheme(theme) {
             state.theme = theme; 
             document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('TNC7_THEME', theme);
+            localStorage.setItem('SANGITA_THEME', theme);
             
             const themeBtns = document.querySelectorAll('.theme-toggle-btn');
             themeBtns.forEach(btn => {
@@ -1052,13 +1053,14 @@
 
         function loadLocalData() {
             try {
-                const storedChannels = localStorage.getItem('tnc7_channels');
+                // MENGUBAH KUNCI LOKAL SECARA MUTLAK
+                const storedChannels = localStorage.getItem('sangita_channels_pro_v1');
                 if (storedChannels) state.items = JSON.parse(storedChannels);
             } catch(e) { console.error("Gagal load lokal", e); }
         }
 
         function saveLocalData() {
-            try { localStorage.setItem('tnc7_channels', JSON.stringify(state.items)); } 
+            try { localStorage.setItem('sangita_channels_pro_v1', JSON.stringify(state.items)); } 
             catch(e) { console.error("Gagal save lokal", e); }
         }
 
