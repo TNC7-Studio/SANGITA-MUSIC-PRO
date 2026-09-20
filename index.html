@@ -1334,11 +1334,11 @@
                 }
                 
                 const now = Date.now();
-                const newChannelsCount = state.items.filter(i => (now - (i.createdAt || 0)) <= 86400000).length;
+                const newChannelsCount = currentFilteredData.filter(i => (now - (i.createdAt || 0)) <= 86400000).length;
 
-                el('stat-total').innerText = state.items.length;
-                el('stat-monet').innerText = state.items.filter(i => i.monet === 'Sudah').length;
-                if(el('stat-aktif')) el('stat-aktif').innerText = state.items.filter(i => i.monet !== 'Sudah').length; 
+                el('stat-total').innerText = currentFilteredData.length;
+                el('stat-monet').innerText = currentFilteredData.filter(i => i.monet === 'Sudah').length;
+                if(el('stat-aktif')) el('stat-aktif').innerText = currentFilteredData.filter(i => i.monet !== 'Sudah').length; 
                 if(el('stat-new')) el('stat-new').innerText = newChannelsCount;
                 
                 updateChartData(currentFilteredData);
@@ -1661,39 +1661,28 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if(imported.channels && Array.isArray(imported.channels)) {
-                        let importedCount = 0;
-                        let duplicateCount = 0;
                         
-                        imported.channels.forEach(newChannel => {
-                            const isDuplicate = state.items.some(existing => {
-                                const isIdSame = newChannel.channelId && newChannel.channelId !== '' && existing.channelId === newChannel.channelId;
-                                const isLinkSame = newChannel.link && newChannel.link !== '' && existing.link === newChannel.link;
-                                const isTitleSame = newChannel.title && newChannel.title !== '' && existing.title === newChannel.title;
-                                return isIdSame || isLinkSame || isTitleSame;
+                        if (state.isCloudConnected && db && userId) {
+                            // Hapus semua data lama di database Cloud
+                            state.items.forEach(oldItem => {
+                                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', oldItem.id);
+                                deleteDoc(docRef).catch(err => console.error("Gagal menghapus data lama dari cloud", err));
                             });
                             
-                            if (!isDuplicate) {
-                                state.items.push(newChannel);
-                                importedCount++;
-                                
-                                if (state.isCloudConnected && db && userId) {
-                                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', newChannel.id);
-                                    setDoc(docRef, newChannel).catch(err => console.error("Gagal simpan ke cloud", err));
-                                }
-                            } else {
-                                duplicateCount++;
-                            }
-                        });
+                            // Masukkan semua data baru ke database Cloud
+                            imported.channels.forEach(newChannel => {
+                                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'channels', newChannel.id);
+                                setDoc(docRef, newChannel).catch(err => console.error("Gagal simpan ke cloud", err));
+                            });
+                        }
+                        
+                        state.items = imported.channels;
                         
                         state.items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
                         saveLocalData();
                         renderTable();
                         
-                        if (duplicateCount > 0) {
-                            showToast(`IMPOR: ${importedCount} BERHASIL, ${duplicateCount} DUPLIKAT DITOLAK!`, true);
-                        } else {
-                            showToast(`DATA BERHASIL DIIMPOR (${importedCount} CHANNEL BARU)`);
-                        }
+                        showToast(`DATA BERHASIL DITIMPA KESELURUHAN (${state.items.length} CHANNEL)`);
                     }
                     el('import-file').value = ''; 
                 } catch(err) { showToast('GAGAL MEMBACA FILE JSON: ' + err.message, true); }
